@@ -1,0 +1,27 @@
+%include "/usr/local/share/csc314/asm_io.inc"
+
+
+segment .data
+
+	my_array	dd	123,456,789,0
+
+segment .bss
+
+
+segment .text
+	global  asm_main
+
+asm_main:
+	push	ebp
+	mov		ebp, esp
+	; ********** CODE STARTS HERE **********
+
+	mov eax, DWORD[my_array + 0]
+	call print_int
+	call print_nl
+
+	; *********** CODE ENDS HERE ***********
+	mov		eax, 0
+	mov		esp, ebp
+	pop		ebp,
+	ret
