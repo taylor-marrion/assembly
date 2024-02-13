@@ -1,0 +1,10 @@
+NAME=strings
+
+all: strings
+
+clean:
+	rm -rf strings strings.o
+
+strings: strings.asm
+	nasm -f elf -F dwarf -g strings.asm
+	gcc -no-pie -g -m32 -o strings strings.o /usr/local/share/csc314/driver.c /usr/local/share/csc314/asm_io.o

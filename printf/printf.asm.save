@@ -1,0 +1,74 @@
+%include "/usr/local/share/csc314/asm_io.inc"
+
+%define	SYS_read	3
+%define	SYS_write	4
+
+%define	STDIN		0
+%define	STDOUT		1
+
+segment .data
+	str1	db	"Hello world", 10,0
+	str2	db	"str3 is '%s', isn't that cool?",10,0
+	str3	db	"woot woot",0
+	str4	db	"%c is a char, but so is %%, %s again!",10,0
+
+segment .bss
+
+
+segment .text
+	global  asm_main
+;	extern printf
+
+asm_main:
+	push	ebp
+	mov		ebp, esp
+	; ********** CODE STARTS HERE **********
+
+	push str1
+	call printf
+	add esp, 4
+
+	push str3
+	push str2
+	call printf
+	add esp, 8
+
+;	push str3
+;	push 'A'
+;	push str4
+;	call printf
+;	add esp, 12
+
+	; *********** CODE ENDS HERE ***********
+	mov		eax, 0
+	mov		esp, ebp
+	pop		ebp
+	ret
+
+printf:
+	push ebp
+	mov ebp, esp
+
+	sub esp, 4	;	reserve memory for local counter variable
+	mov DWORD[ebp - 4], 0		;	int c=0;
+
+;	mov eax, SYS_write			;	performed in loop
+	mov ebx, STDOUT				;	static
+	mov ecx, [ebp + 8]			;	copy address of a[0]
+	mov edx, 1					;	printing single char at a time
+
+	; print character
+	top_print:					;	do {
+	mov eax, SYS_write			;	// sys calls return value to eax
+	int 0x80					;	printf("%c", a[c]);
+
+	cmp BYTE[ecx], '%'
+	jne
+
+	inc ecx						;	c++;
+	cmp BYTE[ecx - 1], 0		;	} while (a[c] != '\0');
+	jne top_print
+
+	mov esp, ebp
+	pop ebp
+	ret
